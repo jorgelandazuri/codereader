@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_code_reader_app" tools:context=".CodeReaderApp">
 
     <Button android:id="@+id/scan_button"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="@string/scan" />
@@ -28,4 +28,10 @@
         android:textIsSelectable="true"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/scan_format" />
+    <ImageView
+        android:id="@+id/result_image"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_margin="10dip"/>
+
 </RelativeLayout>
