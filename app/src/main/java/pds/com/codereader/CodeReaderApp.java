@@ -37,6 +37,7 @@ public class CodeReaderApp extends AppCompatActivity implements OnClickListener 
     private ImageView resultImg;
 
     private Date startScanTime;
+    private Date endScanTime;
 
 
     @Override
@@ -47,7 +48,7 @@ public class CodeReaderApp extends AppCompatActivity implements OnClickListener 
         resultImg = (ImageView) findViewById(R.id.result_image);
         scanBtn = (Button)findViewById(R.id.scan_button);
         formatTxt = (TextView)findViewById(R.id.scan_format);
-        formatTxt = (TextView)findViewById(R.id.scan_time);
+        timeTxt = (TextView)findViewById(R.id.scan_time);
         contentTxt = (TextView)findViewById(R.id.scan_content);
 
         scanBtn.setOnClickListener(this);
@@ -80,19 +81,21 @@ public class CodeReaderApp extends AppCompatActivity implements OnClickListener 
     public void onClick(View v) {
         if(v.getId()==R.id.scan_button){
             IntentIntegrator scanIntegrator = new IntentIntegrator(this);
-            scanIntegrator.initiateScan();
             startScanTime = new Date();
+            scanIntegrator.initiateScan();
         }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         //retrieve scan result
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        Date endScanTime = new Date();
-        long timeToScan = endScanTime.getTime() - startScanTime.getTime();
+        endScanTime = new Date();
+        long timeToScan = -1;
+        if(startScanTime!=null){
+            timeToScan = endScanTime.getTime() - startScanTime.getTime();
+        }
 
         if (scanningResult != null) {
-
             formatTxt.setText(getCodeTypeMsg(scanningResult.getFormatName()));
             contentTxt.setText(getContentMsg(scanningResult.getContents()));
             timeTxt.setText(getTimeMsg(timeToScan));
@@ -106,28 +109,33 @@ public class CodeReaderApp extends AppCompatActivity implements OnClickListener 
     }
 
     private String getTimeMsg(long timeToScan) {
-        return timeToScan >= 0  ? "TIEMPO DE ESCANEO: "+ String.valueOf(timeToScan): UNKNOWN_TIME;
+        return timeToScan >= 0  ? " TIEMPO DE ESCANEO: "+ String.valueOf(timeToScan) + " ms. ": UNKNOWN_TIME;
     }
 
     @NonNull
     private String getContentMsg(String scanContent) {
-        return scanContent != null ? "CONTENIDO: " + scanContent : UNKNOWN_CONTENT;
+        return scanContent != null ? "CONTENIDO\n" + scanContent : UNKNOWN_CONTENT;
     }
 
     @NonNull
     private String getCodeTypeMsg(String scanFormat) {
-        return scanFormat != null ? "TIPO: " + scanFormat : UNKNOWN_TYPE;
+        return scanFormat != null ? " TIPO: " + scanFormat + ". " : UNKNOWN_TYPE;
     }
 
     private void setImageResource(String codeContentMsg, Context context) {
         String[] msgSections = codeContentMsg.split("\\|");
-        if(msgSections != null && msgSections.length > 0 ){
+        try{
             String trimmedResourceName = new String(msgSections[0]).trim().replaceAll(" ", "");
             int id = context.getResources().getIdentifier(trimmedResourceName, "drawable", context.getPackageName());
-            resultImg.setImageResource(id);
-        }else{
-            resultImg.setImageResource(R.drawable.not_available);
+            if(id != 0){
+                resultImg.setImageResource(id);
+            }else{
+                resultImg.setImageResource(R.drawable.not_available);
+            }
+        } catch (Exception e) {
+            Toast toast = makeText(getApplicationContext(), e.toString(), LENGTH_SHORT);
+            toast.show();
         }
-    }
 
+    }
 }

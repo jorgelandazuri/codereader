@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Codereader-PDS</string>
+    <string name="app_name">CodeReaderPdS</string>
     <string name="action_settings">Settings</string>
     <string name="scan">Escanear</string>
 </resources>
